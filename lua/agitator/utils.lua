@@ -13,6 +13,6 @@ local function get_relative_fname()
 end
 
 return {
-    open_file_branch: open_file_branch,
-    get_relative_fname: get_relative_fname
+    open_file_branch = open_file_branch,
+    get_relative_fname = get_relative_fname
 }
