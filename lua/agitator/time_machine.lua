@@ -1,4 +1,5 @@
 local Str = require'plenary.strings'
+local utils = require('agitator.utils')
 
 local function force_length(msg, len)
     if Str.strdisplaywidth(msg) > len then
@@ -35,7 +36,7 @@ local function git_time_machine_display()
     local save_pos = vim.fn.getpos(".")
     -- clear buffer
     vim.api.nvim_command('%delete')
-    open_file_branch(commit_sha, vim.b.time_machine_rel_fname)
+    utils.open_file_branch(commit_sha, vim.b.time_machine_rel_fname)
     vim.fn.setpos('.', save_pos)
     local record = vim.b.time_machine_entries[i]
     local entries_count = #vim.b.time_machine_entries
@@ -88,7 +89,7 @@ end
 
 -- 'git log --no-merges -- afc/pom.xml'
 local function git_time_machine()
-    local relative_fname = get_relative_fname()
+    local relative_fname = utils.get_relative_fname()
     vim.api.nvim_command('new')
     vim.api.nvim_command('nnoremap <buffer> <c-p> :lua git_time_machine_previous()<CR>')
     vim.api.nvim_command('nnoremap <buffer> <c-n> :lua git_time_machine_next()<CR>')
