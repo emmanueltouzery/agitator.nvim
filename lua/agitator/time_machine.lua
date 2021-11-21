@@ -40,7 +40,7 @@ local function git_time_machine_display()
     vim.fn.setpos('.', save_pos)
     local record = vim.b.time_machine_entries[i]
     local entries_count = #vim.b.time_machine_entries
-    vim.defer_fn(function() _G.time_machine_statusline(i, entries_count, record) end, 50)
+    vim.defer_fn(function() time_machine_statusline(i, entries_count, record) end, 50)
 end
 
 local function git_time_machine_next()
@@ -84,7 +84,7 @@ local function handle_time_machine(lines)
     end
     vim.b.time_machine_entries = results
     vim.b.time_machine_cur_idx = 1
-    _G.git_time_machine_next()
+    git_time_machine_next()
 end
 
 -- 'git log --no-merges -- afc/pom.xml'
