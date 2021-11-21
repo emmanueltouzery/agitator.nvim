@@ -91,10 +91,10 @@ end
 local function git_time_machine()
     local relative_fname = utils.get_relative_fname()
     vim.api.nvim_command('new')
-    vim.api.nvim_command('nnoremap <buffer> <c-p> :lua git_time_machine_previous()<CR>')
-    vim.api.nvim_command('nnoremap <buffer> <c-n> :lua git_time_machine_next()<CR>')
-    vim.api.nvim_command('nnoremap <buffer> <c-y> :lua git_time_machine_copy_sha()<CR>')
-    vim.api.nvim_command('nnoremap <buffer> q :lua git_time_machine_quit()<CR>')
+    vim.api.nvim_command('nnoremap <buffer> <c-p> :lua require"agitator".git_time_machine_previous()<CR>')
+    vim.api.nvim_command('nnoremap <buffer> <c-n> :lua require"agitator".git_time_machine_next()<CR>')
+    vim.api.nvim_command('nnoremap <buffer> <c-y> :lua require"agitator".git_time_machine_copy_sha()<CR>')
+    vim.api.nvim_command('nnoremap <buffer> q :lua require"agitator".git_time_machine_quit()<CR>')
     vim.b.time_machine_rel_fname = relative_fname
     local Job = require'plenary.job'
     local output = {}
