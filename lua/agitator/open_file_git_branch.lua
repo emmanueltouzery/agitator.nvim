@@ -62,5 +62,5 @@ local function open_file_git_branch()
 end
 
 return {
-    open_file_git_branch
+    open_file_git_branch = open_file_git_branch
 }
