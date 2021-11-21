@@ -1,4 +1,4 @@
-function parse_blame_record(lines, i)
+local function parse_blame_record(lines, i)
     local record = {}
     record.sha = lines[i]:sub(1, 40)
     i = i + 1
@@ -28,7 +28,7 @@ COLORS = {
     "#d2dc2d",
 }
 
-function render_blame_sidebar(results)
+local function render_blame_sidebar(results)
     local fname = vim.fn.expand('%:p')
     vim.api.nvim_command('leftabove 30 vnew')
     local i = 1
@@ -71,13 +71,13 @@ function render_blame_sidebar(results)
 end
 
 -- https://www.reddit.com/r/vim/comments/9ydreq/vanilla_solutions_to_git_blame/ea1sgej/
-function position_blame_sidebar()
+local function position_blame_sidebar()
     vim.api.nvim_command('set scrollbind')
     vim.api.nvim_command('wincmd p')
     vim.api.nvim_command('set scrollbind')
 end
 
-function handle_blame(lines)
+local function handle_blame(lines)
     local i = 1
     local results = {}
     while lines[i] do
@@ -88,7 +88,7 @@ function handle_blame(lines)
     position_blame_sidebar()
 end
 
-function git_blame()
+local function git_blame()
     local relative_fname = get_relative_fname()
     local Job = require'plenary.job'
     local output = {}
@@ -112,7 +112,7 @@ function git_blame()
     }:start()
 end
 
-function git_blame_close()
+local function git_blame_close()
     local fname = vim.fn.expand('%:p')
     local fname_without_path = fname:match("([^/]+)$")
     local last_buf_id = vim.fn.bufnr('$')
