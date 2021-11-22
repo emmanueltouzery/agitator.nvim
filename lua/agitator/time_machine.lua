@@ -114,6 +114,10 @@ local function git_time_machine()
     }:start()
 end
 
+local function git_time_machine_quit()
+    vim.api.nvim_command('bd')
+end
+
 return {
     git_time_machine = git_time_machine,
     git_time_machine_next = git_time_machine_next,
