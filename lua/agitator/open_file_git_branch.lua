@@ -21,10 +21,6 @@ local function pick_file_from_branch(branch)
                 -- vim.cmd('Gedit ' .. branch .. ':' .. selection[1])
                 vim.api.nvim_command('new')
                 utils.open_file_branch(branch, selection[1])
-                vim.api.nvim_command('setlocal readonly')
-                vim.bo.readonly = true
-                vim.bo.modified = false
-                vim.bo.modifiable = false
             end)
             return true
         end,

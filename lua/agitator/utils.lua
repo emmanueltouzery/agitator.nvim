@@ -5,6 +5,10 @@ local function open_file_branch(branch, fname)
     local fname_without_path = fname:match( "([^/]+)$")
     vim.api.nvim_exec('silent file [' .. branch .. '] ' .. fname_without_path, false)
     vim.api.nvim_command('filetype detect')
+    vim.api.nvim_command('setlocal readonly')
+    vim.bo.readonly = true
+    vim.bo.modified = false
+    vim.bo.modifiable = false
 end
 
 local function get_relative_fname()
