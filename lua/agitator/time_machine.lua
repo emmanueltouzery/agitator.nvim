@@ -35,6 +35,7 @@ local function git_time_machine_display()
     local commit_sha = vim.b.time_machine_entries[i].sha
     local save_pos = vim.fn.getpos(".")
     -- clear buffer
+    vim.bo.readonly = false
     vim.api.nvim_command('%delete')
     utils.open_file_branch(commit_sha, vim.b.time_machine_rel_fname)
     vim.fn.setpos('.', save_pos)
