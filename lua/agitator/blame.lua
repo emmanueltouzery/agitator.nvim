@@ -115,6 +115,7 @@ local function git_blame()
 end
 
 local function git_blame_close()
+    vim.api.nvim_command('set noscrollbind')
     local fname = vim.fn.expand('%:p')
     local fname_without_path = fname:match("([^/]+)$")
     local last_buf_id = vim.fn.bufnr('$')
