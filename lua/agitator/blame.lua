@@ -1,3 +1,5 @@
+local utils = require('agitator.utils')
+
 local function parse_blame_record(lines, i)
     local record = {}
     record.sha = lines[i]:sub(1, 40)
@@ -89,7 +91,7 @@ local function handle_blame(lines)
 end
 
 local function git_blame()
-    local relative_fname = get_relative_fname()
+    local relative_fname = utils.get_relative_fname()
     local Job = require'plenary.job'
     local output = {}
     Job:new {
