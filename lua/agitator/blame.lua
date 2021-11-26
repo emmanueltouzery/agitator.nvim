@@ -74,8 +74,10 @@ end
 
 -- https://www.reddit.com/r/vim/comments/9ydreq/vanilla_solutions_to_git_blame/ea1sgej/
 local function position_blame_sidebar()
+    local blame_buf_id = vim.fn.bufnr('%')
     vim.api.nvim_command('set scrollbind')
-    vim.api.nvim_command('wincmd p')
+    vim.api.nvim_command('wincmd p') -- return to the original window
+    vim.b.blame_buf_id = blame_buf_id
     vim.api.nvim_command('set scrollbind')
 end
 
@@ -117,19 +119,20 @@ end
 local function git_blame_close()
     vim.api.nvim_command('set noscrollbind')
     local fname = vim.fn.expand('%:p')
-    local fname_without_path = fname:match("([^/]+)$")
-    local last_buf_id = vim.fn.bufnr('$')
-    local i = 1
-    while i <= last_buf_id do
-        if vim.fn.bufexists(i) and vim.fn.bufname(i):find('^%[blame%] ' .. fname_without_path) ~= nil then
-            vim.api.nvim_command("bd " .. i)
-            i = last_buf_id + 1
-        end
-        i = i + 1
+    vim.api.nvim_command("bd " .. vim.b.blame_buf_id)
+    vim.b.blame_buf_id = nil
+end
+
+local function git_blame_toggle()
+    if vim.b.blame_buf_id ~= nil then
+        git_blame_close()
+    else
+        git_blame()
     end
 end
 
 return {
     git_blame = git_blame,
-    git_blame_close = git_blame_close
+    git_blame_close = git_blame_close,
+    git_blame_toggle = git_blame_toggle,
 }
