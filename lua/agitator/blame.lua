@@ -1,5 +1,18 @@
 local utils = require('agitator.utils')
 
+-- generated through https://medialab.github.io/iwanthue/
+-- H 0-360
+-- C 30-80
+-- L 5-100
+COLORS = {
+    "#7971fd", "#f759d4", "#ffdb72", "#62438d", "#5b6700", "#7cb3ff", "#01d890", "#fdbbff",
+    "#bfffa3", "#01a4a2", "#005baf", "#afffd8", "#db0051", "#f6ab06", "#276e00", "#ffcd9f",
+    "#01b039", "#902871", "#017eef", "#ff6943", "#fa2f98", "#3643bf", "#d60996", "#66501f",
+    "#f0ff5f", "#ff86d2", "#9d2326", "#ba9600", "#01cce4", "#008554", "#00feed", "#9eab00",
+    "#d2dc2d",
+}
+SIDEBAR_WIDTH = 30
+
 local function parse_blame_record(lines, i)
     local record = {}
     record.sha = lines[i]:sub(1, 40)
@@ -18,21 +31,9 @@ local function parse_blame_record(lines, i)
     return i, record
 end
 
--- generated through https://medialab.github.io/iwanthue/
--- H 0-360
--- C 30-80
--- L 5-100
-COLORS = {
-    "#7971fd", "#f759d4", "#ffdb72", "#62438d", "#5b6700", "#7cb3ff", "#01d890", "#fdbbff",
-    "#bfffa3", "#01a4a2", "#005baf", "#afffd8", "#db0051", "#f6ab06", "#276e00", "#ffcd9f",
-    "#01b039", "#902871", "#017eef", "#ff6943", "#fa2f98", "#3643bf", "#d60996", "#66501f",
-    "#f0ff5f", "#ff86d2", "#9d2326", "#ba9600", "#01cce4", "#008554", "#00feed", "#9eab00",
-    "#d2dc2d",
-}
-
 local function render_blame_sidebar(results)
     local fname = vim.fn.expand('%:p')
-    vim.api.nvim_command('leftabove 30 vnew')
+    vim.api.nvim_command('leftabove ' .. SIDEBAR_WIDTH .. ' vnew')
     local i = 1
     while COLORS[i] do
         vim.api.nvim_command("highlight BLAME_COL" .. i .. " guifg=" .. COLORS[i])
