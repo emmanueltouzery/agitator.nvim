@@ -82,13 +82,18 @@ local function position_blame_sidebar()
     vim.api.nvim_command('set scrollbind')
 end
 
-local function handle_blame(lines)
+local function parse_blame_lines(lines)
     local i = 1
     local results = {}
     while lines[i] do
         i, line_info = parse_blame_record(lines, i)
         table.insert(results, line_info)
     end
+    return results
+end
+
+local function handle_blame(lines)
+    local results = parse_blame_lines(lines)
     render_blame_sidebar(results)
     position_blame_sidebar()
 end
@@ -136,4 +141,5 @@ return {
     git_blame = git_blame,
     git_blame_close = git_blame_close,
     git_blame_toggle = git_blame_toggle,
+    parse_blame_lines = parse_blame_lines,
 }
