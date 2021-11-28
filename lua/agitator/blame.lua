@@ -11,7 +11,7 @@ COLORS = {
     "#f0ff5f", "#ff86d2", "#9d2326", "#ba9600", "#01cce4", "#008554", "#00feed", "#9eab00",
     "#d2dc2d",
 }
-SIDEBAR_WIDTH = 30
+DEFAULT_SIDEBAR_WIDTH = 30
 
 local function parse_blame_record(lines, i)
     local record = {}
@@ -31,9 +31,13 @@ local function parse_blame_record(lines, i)
     return i, record
 end
 
-local function render_blame_sidebar(results)
+local function render_blame_sidebar(results, opts)
     local fname = vim.fn.expand('%:p')
-    vim.api.nvim_command('leftabove ' .. SIDEBAR_WIDTH .. ' vnew')
+    local w = DEFAULT_SIDEBAR_WIDTH
+    if opts ~= nil and opts.sidebar_width ~= nil then
+        w = opts.sidebar_width
+    end
+    vim.api.nvim_command('leftabove ' .. w .. ' vnew')
     local i = 1
     while COLORS[i] do
         vim.api.nvim_command("highlight BLAME_COL" .. i .. " guifg=" .. COLORS[i])
@@ -92,13 +96,13 @@ local function parse_blame_lines(lines)
     return results
 end
 
-local function handle_blame(lines)
+local function handle_blame(lines, opts)
     local results = parse_blame_lines(lines)
-    render_blame_sidebar(results)
+    render_blame_sidebar(results, opts)
     position_blame_sidebar()
 end
 
-local function git_blame()
+local function git_blame(opts)
     local relative_fname = utils.get_relative_fname()
     local Job = require'plenary.job'
     local output = {}
@@ -116,7 +120,7 @@ local function git_blame()
         end,
         on_exit = function(self, code, signal)
             vim.schedule_wrap(function()
-                handle_blame(output)
+                handle_blame(output, opts)
             end)()
         end
     }:start()
@@ -129,11 +133,11 @@ local function git_blame_close()
     vim.b.blame_buf_id = nil
 end
 
-local function git_blame_toggle()
+local function git_blame_toggle(opts)
     if vim.b.blame_buf_id ~= nil then
         git_blame_close()
     else
-        git_blame()
+        git_blame(opts)
     end
 end
 
