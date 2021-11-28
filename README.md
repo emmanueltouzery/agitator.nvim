@@ -34,6 +34,9 @@ Details about the currently displayed version appear in the vim statusline.
 
 ## General
 
+To call any function, if you use a plugin manager such as Packer, you must
+prepend `require('agitator')`. For instance `require('agitator').git_blame()`.
+
 I'm really a beginner in nvim/lua, so don't be surprised if some things are
 strangely or wrongly implemented. There are also a couple of ugly hacks. Pull
 requests are welcome. I'll do my best to fix bugs, but don't expect too much.
