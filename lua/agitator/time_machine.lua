@@ -77,14 +77,18 @@ local function parse_time_machine_record(lines, i)
     return i, record
 end
 
-local function handle_time_machine(lines)
+local function parse_time_machine(lines)
     local i = 1
     local results = {}
     while lines[i] do
         i, line_info = parse_time_machine_record(lines, i)
         table.insert(results, line_info)
     end
-    vim.b.time_machine_entries = results
+    return results
+end
+
+local function handle_time_machine(lines)
+    vim.b.time_machine_entries = parse_time_machine(lines)
     vim.b.time_machine_cur_idx = 1
     git_time_machine_next()
 end
@@ -131,5 +135,6 @@ return {
     git_time_machine_next = git_time_machine_next,
     git_time_machine_previous = git_time_machine_previous,
     git_time_machine_copy_sha = git_time_machine_copy_sha,
-    git_time_machine_quit = git_time_machine_quit
+    git_time_machine_quit = git_time_machine_quit,
+    parse_time_machine = parse_time_machine,
 }

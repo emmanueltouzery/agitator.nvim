@@ -1,18 +1,9 @@
--- package.path = package.path .. ";../;vendor/plenary.nvim/"
 local blame = require('agitator.blame')
-
--- https://stackoverflow.com/a/7615129/516188
-function as_lines(inputstr)
-        local t={}
-        for str in string.gmatch(inputstr, "([^\n]+)") do
-                table.insert(t, str)
-        end
-        return t
-end
+local test_utils = require('tests.test_utils')
 
 describe("Blame parsing", function()
     it("should parse a simple case", function()
-        local actual = blame.parse_blame_lines(as_lines([[
+        local actual = blame.parse_blame_lines(test_utils.as_lines([[
 f115609b2f2b6975de6072777e4d34b5d28e463d 1 1 2
 author Emmanuel Touzery
 author-mail <etouzery@gmail.com>
@@ -74,5 +65,6 @@ filename lua/agitator/blame.lua
         assert.are.same(27, actual[3].date.day)
         assert.are.same(15, actual[3].date.hour)
         assert.are.same(19, actual[3].date.min)
+        assert(actual[4] == nil)
     end)
 end)
