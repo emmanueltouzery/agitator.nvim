@@ -3,7 +3,17 @@ local function open_file_branch(branch, fname)
     vim.api.nvim_exec('silent r! git show ' .. branch .. ':' .. fname, false)
     vim.api.nvim_command('1d')
     local fname_without_path = fname:match( "([^/]+)$")
-    vim.api.nvim_exec('silent file [' .. branch .. '] ' .. fname_without_path, false)
+    local base_bufcmd = 'silent file [' .. branch .. '] ' .. fname_without_path
+    -- if we try to open twice the same file from the same branch, we get
+    -- vim failures "buffer name already in use"
+    if not pcall(vim.api.nvim_exec, base_bufcmd, false) then
+        local succeeded = false
+        local i = 2
+        while not succeeded and i < 20 do
+            succeeded = pcall(vim.api.nvim_exec, base_bufcmd .. ' (' .. i .. ')', false)
+            i = i + 1
+        end
+    end
     vim.api.nvim_command('filetype detect')
     vim.api.nvim_command('setlocal readonly')
     vim.bo.readonly = true
