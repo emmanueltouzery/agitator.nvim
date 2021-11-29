@@ -1,14 +1,16 @@
 local utils = require('agitator.utils')
+-- https://github.com/nvim-telescope/telescope.nvim/blob/master/lua/telescope/builtin/git.lua#L269
+local pickers = require "telescope.pickers"
+local finders = require "telescope.finders"
+local conf = require("telescope.config").values
+local actions = require "telescope.actions"
+local action_state = require "telescope.actions.state"
 
 local function pick_file_from_branch(branch)
-    local pickers = require "telescope.pickers"
-    local finders = require "telescope.finders"
-    local conf = require("telescope.config").values
-    local actions = require "telescope.actions"
-    local action_state = require "telescope.actions.state"
     local opts = {}
     local relative_fname = utils.get_relative_fname()
-    opts.initial_model = 'insert'
+    opts.initial_mode = 'insert'
+    opts.default_text = relative_fname
     pickers.new(opts, {
         prompt_title = "filename",
         finder = finders.new_oneshot_job { "git", "ls-tree", "-r", "--name-only", branch, opts },
@@ -25,20 +27,9 @@ local function pick_file_from_branch(branch)
             return true
         end,
     }):find()
-    -- the file picker is not insert mode.. possibly it's reusing the picker
-    -- from the previous branch picker... switch to insert mode (i), then
-    -- enter the current filename. Couldn't find how to set the picker default
-    -- entry text otherwise -- did ask on the telescope gitter, no answer.
-    vim.fn.feedkeys('i' .. relative_fname)
 end
 
 local function open_file_git_branch()
-    -- https://github.com/nvim-telescope/telescope.nvim/blob/master/lua/telescope/builtin/git.lua#L269
-    local pickers = require "telescope.pickers"
-    local finders = require "telescope.finders"
-    local conf = require("telescope.config").values
-    local actions = require "telescope.actions"
-    local action_state = require "telescope.actions.state"
     local opts = {}
 
     pickers.new(opts, {
@@ -50,7 +41,11 @@ local function open_file_git_branch()
             actions.close(prompt_bufnr)
             local selection = action_state.get_selected_entry()
             local branch = selection[1]:sub(3)
-            pick_file_from_branch(branch)
+            -- schedule so this triggers when telescope cleans up
+            -- this picker, else telescope behaves a little strangely
+            vim.schedule(function()
+                pick_file_from_branch(branch)
+            end)
           end)
           return true
         end,
