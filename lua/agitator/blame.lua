@@ -33,6 +33,8 @@ end
 
 local function render_blame_sidebar(results, opts)
     local fname = vim.fn.expand('%:p')
+    local save_pos = vim.fn.getpos(".")
+    save_pos[3] = 1 -- reset the column to the leftmost one
     local w = DEFAULT_SIDEBAR_WIDTH
     if opts ~= nil and opts.sidebar_width ~= nil then
         w = opts.sidebar_width
@@ -59,7 +61,6 @@ local function render_blame_sidebar(results, opts)
                 last_color = last_color + 1
             end
             prev_color = sha_to_highlight[r.sha]
-                
         end
         vim.fn.append('$', prev_row)
         vim.api.nvim_buf_add_highlight(0, -1, prev_color, i, 0, -1)
@@ -75,15 +76,20 @@ local function render_blame_sidebar(results, opts)
     vim.bo.readonly = true
     vim.bo.modified = false
     vim.bo.modifiable = false
+    return save_pos
 end
 
 -- https://www.reddit.com/r/vim/comments/9ydreq/vanilla_solutions_to_git_blame/ea1sgej/
-local function position_blame_sidebar()
+local function position_blame_sidebar(save_pos)
     local blame_buf_id = vim.fn.bufnr('%')
-    vim.api.nvim_command('set scrollbind')
+    vim.fn.setpos('.', save_pos)
+    vim.api.nvim_command('setlocal scrollbind')
+    vim.api.nvim_command('setlocal cursorbind nowrap')
     vim.api.nvim_command('wincmd p') -- return to the original window
     vim.b.blame_buf_id = blame_buf_id
-    vim.api.nvim_command('set scrollbind')
+    vim.api.nvim_command('setlocal scrollbind')
+    vim.api.nvim_command('setlocal cursorbind')
+    vim.api.nvim_command('syncbind')
 end
 
 local function parse_blame_lines(lines)
@@ -98,8 +104,8 @@ end
 
 local function handle_blame(lines, opts)
     local results = parse_blame_lines(lines)
-    render_blame_sidebar(results, opts)
-    position_blame_sidebar()
+    local save_pos = render_blame_sidebar(results, opts)
+    position_blame_sidebar(save_pos)
 end
 
 local function git_blame(opts)
