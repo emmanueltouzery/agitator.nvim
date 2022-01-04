@@ -108,7 +108,9 @@ local function git_time_machine()
         command = 'git',
         -- i'd really want a plumbing command here, but i think there isn't one
         -- https://stackoverflow.com/a/29239964/516188
-        args = {'log', '--no-merges', '--follow', '--date=iso', '--', relative_fname},
+        -- no follow right now as we don't support it well
+        -- args = {'log', '--no-merges', '--follow', '--date=iso', '--', relative_fname}, 
+        args = {'log', '--no-merges', '--date=iso', '--', relative_fname},
         on_stdout = function(error, data, self)
             table.insert(output, data)
         end,
