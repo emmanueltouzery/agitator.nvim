@@ -21,7 +21,7 @@ local function pick_file_from_branch(branch)
                 local selection = action_state.get_selected_entry()
                 -- open fugitive for that branch and filename
                 -- vim.cmd('Gedit ' .. branch .. ':' .. selection[1])
-                vim.api.nvim_command('new')
+                vim.api.nvim_command('enew')
                 utils.open_file_branch(branch, selection[1])
             end)
             return true
