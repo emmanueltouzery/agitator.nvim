@@ -1,6 +1,6 @@
 -- https://vi.stackexchange.com/a/3749/38754
 local function open_file_branch(branch, fname)
-    vim.api.nvim_exec('silent r! git show ' .. branch .. ':' .. fname, false)
+    vim.api.nvim_exec('silent r! git show ' .. branch .. ':./' .. fname, false)
     vim.api.nvim_command('1d')
     local fname_without_path = fname:match( "([^/]+)$")
     local base_bufcmd = 'silent file [' .. branch .. '] ' .. fname_without_path
