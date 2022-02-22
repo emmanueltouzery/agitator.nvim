@@ -9,25 +9,21 @@ local function force_length(msg, len)
     end
 end
 
-local function statusline_escape(msg)
-    return msg:gsub(' ', '\\ '):gsub('"', '\\"')
-end
-
 local function time_machine_statusline(i, entries_count, record)
-    vim.api.nvim_command('set laststatus=2')
-    vim.api.nvim_command('set statusline=')
-    vim.api.nvim_command('set statusline+=%#StatusLineNC#')
-    vim.api.nvim_command('set statusline+=['  .. (entries_count + 1 - i) .. '\\/' .. entries_count .. ']')
-    vim.api.nvim_command('set statusline+=%#Title#')
-    vim.api.nvim_command('set statusline+=\\ ' .. statusline_escape(force_length(record.author, 18)))
-    vim.api.nvim_command('set statusline+=\\ ')
-    vim.api.nvim_command('set statusline+=%#TabLineSel#')
-    vim.api.nvim_command('set statusline+=' .. statusline_escape(force_length(record.message, 50)))
-    vim.api.nvim_command('set statusline+=%#TabLine#')
-    vim.api.nvim_command('set statusline+=\\ ' .. record.date:gsub(' ', '\\ ') .. '\\ ')
-    vim.api.nvim_command('set statusline+=%#StatusLineNC#')
-    vim.api.nvim_command('set statusline+=<c-p>\\ Previous\\ \\|\\ <c-n>\\ Next\\ \\|\\ <c-y>\\ Copy\\ commit\\ SHA\\ \\|\\ [q]uit')
-    vim.api.nvim_command('set statusline+=%<') -- please truncate at the end
+    if vim.b.width ~= vim.fn.winwidth(0) or vim.b.height ~= vim.fn.winheight(0) then
+        -- the window was resized, destroy & re-create the popup
+        -- to reposition it
+        vim.api.nvim_win_close(vim.b.popup_win, true)
+        setup_timemachine_popup()
+    end
+
+    local lines = {
+        force_length(record.author, 53), 
+        force_length(record.message, 53), 
+        record.date, 
+        '<c-p> Previous | <c-n> Next | <c-y> Copy SHA | [q]uit'
+    }
+    vim.api.nvim_buf_set_lines(vim.b.popup_buf, 0, -1, false, lines)
 end
 
 local function git_time_machine_display()
@@ -93,6 +89,29 @@ local function handle_time_machine(lines)
     git_time_machine_next()
 end
 
+function setup_timemachine_popup()
+  vim.b.width = vim.fn.winwidth(0)
+  vim.b.height = vim.fn.winheight(0)
+
+  vim.b.popup_buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_option(vim.b.popup_buf, 'buftype', 'nofile')
+  vim.api.nvim_buf_set_option(vim.b.popup_buf, 'modifiable', true)
+
+  local opts = {
+    focusable = false,
+    style = "minimal",
+    border = "rounded",
+    relative = "win",
+    width = 53,
+    height = 4,
+    anchor = "SE",
+    row = vim.b.height,
+    col = vim.b.width,
+  }
+
+  vim.b.popup_win = vim.api.nvim_open_win(vim.b.popup_buf, false, opts)
+end
+
 -- 'git log --no-merges -- afc/pom.xml'
 local function git_time_machine()
     local relative_fname = utils.get_relative_fname()
@@ -101,6 +120,7 @@ local function git_time_machine()
     vim.api.nvim_command('nnoremap <buffer> <c-n> :lua require"agitator".git_time_machine_next()<CR>')
     vim.api.nvim_command('nnoremap <buffer> <c-y> :lua require"agitator".git_time_machine_copy_sha()<CR>')
     vim.api.nvim_command('nnoremap <buffer> q :lua require"agitator".git_time_machine_quit()<CR>')
+    setup_timemachine_popup()
     vim.b.time_machine_rel_fname = relative_fname
     local Job = require'plenary.job'
     local output = {}
@@ -123,6 +143,7 @@ local function git_time_machine()
 end
 
 local function git_time_machine_quit()
+    vim.api.nvim_win_close(vim.b.popup_win, true)
     vim.api.nvim_command('bd')
 end
 
