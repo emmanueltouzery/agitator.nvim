@@ -24,6 +24,11 @@ local function time_machine_statusline(i, entries_count, record)
         '<c-p> Previous | <c-n> Next | <c-y> Copy SHA | [q]uit'
     }
     vim.api.nvim_buf_set_lines(vim.b.popup_buf, 0, -1, false, lines)
+
+    vim.api.nvim_buf_add_highlight(vim.b.popup_buf, -1, "Identifier", 0, 0, -1);
+    vim.api.nvim_buf_add_highlight(vim.b.popup_buf, -1, "PreProc", 1, 0, -1);
+    vim.api.nvim_buf_add_highlight(vim.b.popup_buf, -1, "Special", 2, 0, -1);
+    vim.api.nvim_buf_add_highlight(vim.b.popup_buf, -1, "SpecialComment", 3, 0, -1);
 end
 
 local function git_time_machine_display()
@@ -90,26 +95,26 @@ local function handle_time_machine(lines)
 end
 
 function setup_timemachine_popup()
-  vim.b.width = vim.fn.winwidth(0)
-  vim.b.height = vim.fn.winheight(0)
+    vim.b.width = vim.fn.winwidth(0)
+    vim.b.height = vim.fn.winheight(0)
 
-  vim.b.popup_buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_option(vim.b.popup_buf, 'buftype', 'nofile')
-  vim.api.nvim_buf_set_option(vim.b.popup_buf, 'modifiable', true)
+    vim.b.popup_buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(vim.b.popup_buf, 'buftype', 'nofile')
+    vim.api.nvim_buf_set_option(vim.b.popup_buf, 'modifiable', true)
 
-  local opts = {
-    focusable = false,
-    style = "minimal",
-    border = "rounded",
-    relative = "win",
-    width = 53,
-    height = 4,
-    anchor = "SE",
-    row = vim.b.height,
-    col = vim.b.width,
-  }
+    local opts = {
+        focusable = false,
+        style = "minimal",
+        border = "rounded",
+        relative = "win",
+        width = 53,
+        height = 4,
+        anchor = "SE",
+        row = vim.b.height,
+        col = vim.b.width,
+    }
 
-  vim.b.popup_win = vim.api.nvim_open_win(vim.b.popup_buf, false, opts)
+    vim.b.popup_win = vim.api.nvim_open_win(vim.b.popup_buf, false, opts)
 end
 
 -- 'git log --no-merges -- afc/pom.xml'
