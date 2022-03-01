@@ -21,12 +21,18 @@ local function open_file_branch(branch, fname)
     vim.bo.modifiable = false
 end
 
+-- https://stackoverflow.com/a/34953646/516188
+function escape_pattern(text)
+    return text:gsub("([^%w])", "%%%1")
+end
+
 local function get_relative_fname()
     local fname = vim.fn.expand('%:p')
-    return fname:gsub(vim.fn.getcwd() .. '/', '')
+    return fname:gsub(escape_pattern(vim.fn.getcwd()) .. '/', '')
 end
 
 return {
     open_file_branch = open_file_branch,
-    get_relative_fname = get_relative_fname
+    get_relative_fname = get_relative_fname,
+    escape_pattern = escape_pattern,
 }
