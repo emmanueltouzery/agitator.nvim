@@ -30,7 +30,7 @@ The selected file from another branch is then displayed in a read-only buffer.
 The time machine allows you to see the history of a single file through time.
 It opens a new read-only window, where you can navigate through
 past versions of the file and view their contents.
-Details about the currently displayed version appear in a popup window.
+Details about the currently displayed version appear in a popup window at the bottom-right.
 
 * `git_time_machine()`
 
