@@ -25,6 +25,8 @@ The selected file from another branch is then displayed in a read-only buffer.
 
 ## time machine
 
+![time machine screenshot](https://raw.githubusercontent.com/wiki/emmanueltouzery/agitator.nvim/time-machine.png)
+
 The time machine allows you to see the history of a single file through time.
 It opens a new read-only window, where you can navigate through
 past versions of the file and view their contents.
