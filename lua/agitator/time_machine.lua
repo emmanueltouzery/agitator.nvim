@@ -20,7 +20,7 @@ local function time_machine_statusline(i, entries_count, record)
     local lines = {
         force_length(record.author, 53), 
         force_length(record.message, 53), 
-        record.date, 
+        record.date .. " - " .. (entries_count - i + 1) .. "/" .. entries_count,
         '<c-p> Previous | <c-n> Next | <c-y> Copy SHA | [q]uit'
     }
     vim.api.nvim_buf_set_lines(vim.b.popup_buf, 0, -1, false, lines)
