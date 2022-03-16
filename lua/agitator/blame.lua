@@ -147,9 +147,24 @@ local function git_blame_toggle(opts)
     end
 end
 
+local function git_blame_commit_for_line()
+    local relative_fname = utils.get_relative_fname()
+    local Job = require'plenary.job'
+    local output
+    Job:new {
+        command = 'git',
+        args = {'blame', '-L' .. vim.fn.line('.') .. ',' .. vim.fn.line('.'), relative_fname},
+        on_stdout = function(error, data, self)
+            output = data:gsub("%s.*$", "")
+        end,
+    }:sync()
+    return output
+end
+
 return {
     git_blame = git_blame,
     git_blame_close = git_blame_close,
     git_blame_toggle = git_blame_toggle,
     parse_blame_lines = parse_blame_lines,
+    git_blame_commit_for_line = git_blame_commit_for_line,
 }

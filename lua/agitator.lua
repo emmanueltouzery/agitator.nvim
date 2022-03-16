@@ -7,6 +7,7 @@ return {
     git_blame = blame.git_blame,
     git_blame_close = blame.git_blame_close,
     git_blame_toggle = blame.git_blame_toggle,
+    git_blame_commit_for_line = blame.git_blame_commit_for_line,
     git_time_machine = time_machine.git_time_machine,
     git_time_machine_next = time_machine.git_time_machine_next,
     git_time_machine_previous = time_machine.git_time_machine_previous,
