@@ -134,6 +134,7 @@ end
 
 local function git_blame_close()
     vim.api.nvim_command('set noscrollbind')
+    vim.api.nvim_command('set nocursorbind')
     local fname = vim.fn.expand('%:p')
     vim.api.nvim_command("bd " .. vim.b.blame_buf_id)
     vim.b.blame_buf_id = nil
