@@ -10,10 +10,23 @@ Blame adds a window on the left side of your window with blame information for t
 The sidebar is scroll bound to the main file window.
 Three functions are exported:
 
-* `git_blame({sidebar_width?})`: open the sidebar. The default width is 30 characters, you
+- `git_blame({sidebar_width?})`: open the sidebar. The default width is 30 characters, you
   can optionally pass another width in a record, eg `{sidebar_width = 20}`;
-* `git_blame_close()`: close the blame sidebar;
-* `git_blame_toggle()`: toggle (open or close) the blame sidebar.
+- `git_blame_close()`: close the blame sidebar;
+- `git_blame_toggle()`: toggle (open or close) the blame sidebar.
+- `git_blame_commit_for_line()`: get the git commit SHA for the current line, as string.
+
+This last function, to get the commit SHA, can allow to display the commit for a certain line of code.
+However you'll need an external plugin to display the commit, such as [neogit](https://github.com/TimUntersberger/neogit)
+or [diffview.nvim](https://github.com/sindrets/diffview.nvim/).
+Here is an example of integration with diffview:
+
+```lua
+function _G.ShowCommitAtLine()
+    local commit_sha = require"agitator".git_blame_commit_for_line()
+    vim.cmd("DiffviewOpen " .. commit_sha .. "^.." .. commit_sha)
+end
+```
 
 ## git find file
 
@@ -21,7 +34,7 @@ Git find file will open two telescope pickers in succession. The first one to
 pick a git branch; the second one to pick a file from that branch.
 The selected file from another branch is then displayed in a read-only buffer.
 
-* `open_file_git_branch()`
+- `open_file_git_branch()`
 
 ## time machine
 
@@ -32,7 +45,7 @@ It opens a new read-only window, where you can navigate through
 past versions of the file and view their contents.
 Details about the currently displayed version appear in a popup window at the bottom-right.
 
-* `git_time_machine()`
+- `git_time_machine()`
 
 ## General
 
