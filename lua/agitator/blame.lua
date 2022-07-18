@@ -22,7 +22,7 @@ local function parse_blame_record(lines, i)
         if l:match('^author ') then
             record.author = l:sub(8)
         -- for some reason author-time doesn't match, so i put a dot
-        elseif l:match('^author.time ') then 
+        elseif l:match('^author.time ') then
             record.date = os.date('*t', l:sub(13))
         end
         i = i + 1
@@ -71,6 +71,7 @@ local function render_blame_sidebar(results, opts)
     vim.api.nvim_command('set nowrap')
     vim.api.nvim_command('set nonumber')
     vim.api.nvim_command('set norelativenumber')
+    vim.api.nvim_command('set filetype=agitator')
     local fname_without_path = fname:match( "([^/]+)$")
     vim.api.nvim_exec('silent file [blame] ' .. fname_without_path, false)
     vim.bo.readonly = true
