@@ -110,18 +110,25 @@ local function handle_blame(lines, opts)
 end
 
 local function git_blame(opts)
-    local relative_fname = utils.get_relative_fname()
     local Job = require'plenary.job'
     local output = {}
-    Job:new {
+    local relative_fname
+    local buf_fname, buf_commit = utils.fname_commit_associated_with_buffer()
+    if buf_fname ~= nil then
+        relative_fname = buf_fname
+    else 
+        relative_fname = utils.get_relative_fname()
+    end
+    -- i think -p only would be maybe faster, git's output differs with
+    -- -p or --line-porcelain! I mean I see different authors for different
+    -- lines between these flags. And everyone matches with --line-porcelain.
+    -- Also, -w, ignore whitespace, is nice, and intellij does it, but
+    -- gitsigns doesn't, and i'd like to match with gitsigns.
+    -- args = {'blame', relative_fname, '--line-porcelain', '-w'},
+    local git_args = {'blame', relative_fname, '--line-porcelain'}
+    local job_params = {
         command = 'git',
-        -- i think -p only would be maybe faster, git's output differs with
-        -- -p or --line-porcelain! I mean I see different authors for different
-        -- lines between these flags. And everyone matches with --line-porcelain.
-        -- Also, -w, ignore whitespace, is nice, and intellij does it, but
-        -- gitsigns doesn't, and i'd like to match with gitsigns.
-        -- args = {'blame', relative_fname, '--line-porcelain', '-w'},
-        args = {'blame', relative_fname, '--line-porcelain'},
+        args = git_args,
         on_stdout = function(error, data, self)
             table.insert(output, data)
         end,
@@ -130,7 +137,12 @@ local function git_blame(opts)
                 handle_blame(output, opts)
             end)()
         end
-    }:start()
+    }
+    if buf_commit ~= nil then
+        table.insert(git_args, vim.b.agitator_commit)
+        job_params.cwd = utils.git_root_folder()
+    end
+    Job:new(job_params):start()
 end
 
 local function git_blame_close()
