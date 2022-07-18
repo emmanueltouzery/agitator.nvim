@@ -10,8 +10,9 @@ Blame adds a window on the left side of your window with blame information for t
 The sidebar is scroll bound to the main file window.
 Three functions are exported:
 
-- `git_blame({sidebar_width?})`: open the sidebar. The default width is 30 characters, you
-  can optionally pass another width in a record, eg `{sidebar_width = 20}`;
+- `git_blame({sidebar_width?, formatter?})`: open the sidebar. The default width is 30 characters, you
+  can optionally pass another width in a record, eg `{sidebar_width = 20}`. You can also pass in a
+  formatter function, to display the commit information, see lower;
 - `git_blame_close()`: close the blame sidebar;
 - `git_blame_toggle()`: toggle (open or close) the blame sidebar.
 - `git_blame_commit_for_line()`: get the git commit SHA for the current line, as string.
@@ -27,6 +28,21 @@ function _G.ShowCommitAtLine()
     vim.cmd("DiffviewOpen " .. commit_sha .. "^.." .. commit_sha)
 end
 ```
+
+The formatter function for `git_blame()` lets you customize the rendering of the blame information.
+For instance, you could call:
+
+```lua
+require'agitator'.git_blame{formatter=function(r) return r.author .. " => " .. r.summary; end}
+```
+
+And you'd get in a sidebar the author and the commit summary instead of the author and date, which is
+the default.
+The formatter function receives a single parameter, which has the following fields:
+
+- author
+- summary
+- date, which is a `os.date` which has among others `year` `month` and `day` fields.
 
 ## git find file
 

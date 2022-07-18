@@ -24,6 +24,8 @@ local function parse_blame_record(lines, i)
         -- for some reason author-time doesn't match, so i put a dot
         elseif l:match('^author.time ') then
             record.date = os.date('*t', l:sub(13))
+        elseif l:match('^summary ') then
+            record.summary = l:sub(9)
         end
         i = i + 1
     end
@@ -53,8 +55,12 @@ local function render_blame_sidebar(results, opts)
     while results[i] do
         local r = results[i]
         if r['author'] ~= nil then
-            prev_row = string.format('%02d-%02d-%02d %s',
-                r.date.year, r.date.month, r.date.day, r.author)
+            if opts ~= nil and opts.formatter ~= nil then
+                prev_row = opts.formatter(r)
+            else
+                prev_row = string.format('%02d-%02d-%02d %s',
+                    r.date.year, r.date.month, r.date.day, r.author)
+            end
 
             if sha_to_highlight[r.sha] == nil then
                 sha_to_highlight[r.sha] = "BLAME_COL" .. (last_color % #COLORS)
