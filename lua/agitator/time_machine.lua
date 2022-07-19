@@ -39,7 +39,9 @@ local function git_time_machine_display()
     vim.bo.readonly = false
     vim.bo.modifiable = true
     vim.api.nvim_command('%delete')
-    utils.open_file_branch(commit_sha, vim.b.time_machine_rel_fname)
+    local complete_fname = utils.git_root_folder() .. '/' .. vim.b.time_machine_entries[i].filename
+    local relative_fname = complete_fname:gsub(escape_pattern(vim.fn.getcwd()) .. '/', '')
+    utils.open_file_branch(commit_sha, relative_fname)
     vim.fn.setpos('.', save_pos)
     local record = vim.b.time_machine_entries[i]
     local entries_count = #vim.b.time_machine_entries
@@ -72,6 +74,11 @@ local function parse_time_machine_record(lines, i)
     record.date = lines[i]:sub(9, 24)
     i = i + 2
     record.message = lines[i]:sub(5)
+    while i <= #lines and #lines[i] > 0 do
+        i = i + 1
+    end
+    i = i + 1
+    record.filename = lines[i]
     while i <= #lines and lines[i]:sub(1, 7) ~= 'commit ' do
         i = i + 1
     end
@@ -133,9 +140,7 @@ local function git_time_machine()
         command = 'git',
         -- i'd really want a plumbing command here, but i think there isn't one
         -- https://stackoverflow.com/a/29239964/516188
-        -- no follow right now as we don't support it well
-        -- args = {'log', '--no-merges', '--follow', '--date=iso', '--', relative_fname}, 
-        args = {'log', '--no-merges', '--date=iso', '--', relative_fname},
+        args = {'log', '--name-only', '--no-merges', '--follow', '--date=iso', '--', relative_fname}, 
         on_stdout = function(error, data, self)
             table.insert(output, data)
         end,
