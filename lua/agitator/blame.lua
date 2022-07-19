@@ -168,16 +168,25 @@ local function git_blame_toggle(opts)
 end
 
 local function git_blame_commit_for_line()
-    local relative_fname = utils.get_relative_fname()
-    local Job = require'plenary.job'
+    local relative_fname, commit = utils.fname_commit_associated_with_buffer()
+    if relative_fname == nil then
+        relative_fname = utils.get_relative_fname()
+    end
     local output
-    Job:new {
+    local git_args = {'blame', '-L' .. vim.fn.line('.') .. ',' .. vim.fn.line('.'), relative_fname}
+    local job_params = {
         command = 'git',
-        args = {'blame', '-L' .. vim.fn.line('.') .. ',' .. vim.fn.line('.'), relative_fname},
+        args = git_args,
         on_stdout = function(error, data, self)
             output = data:gsub("%s.*$", "")
         end,
-    }:sync()
+    }
+    if commit ~= nil then
+        table.insert(git_args, commit)
+        job_params.cwd = utils.git_root_folder()
+    end
+    local Job = require'plenary.job'
+    Job:new(job_params):sync()
     return output
 end
 
