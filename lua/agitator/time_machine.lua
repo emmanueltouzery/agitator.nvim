@@ -13,7 +13,9 @@ local function time_machine_statusline(i, entries_count, record)
     if vim.b.width ~= vim.fn.winwidth(0) or vim.b.height ~= vim.fn.winheight(0) then
         -- the window was resized, destroy & re-create the popup
         -- to reposition it
-        vim.api.nvim_win_close(vim.b.popup_win, true)
+        if vim.api.nvim_win_is_valid(vim.b.popup_win) then
+            vim.api.nvim_win_close(vim.b.popup_win, true)
+        end
         setup_timemachine_popup()
     end
 
