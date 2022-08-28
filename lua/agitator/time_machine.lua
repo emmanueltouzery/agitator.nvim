@@ -70,6 +70,11 @@ local function git_time_machine_previous()
     git_time_machine_display()
 end
 
+local function git_time_machine_quit()
+    vim.api.nvim_win_close(vim.b.popup_win, true)
+    vim.api.nvim_command('bd')
+end
+
 local function parse_time_machine_record(lines, i)
     if lines[i]:sub(1, 7) ~= "commit " then
         error("Expected 'commit', got " .. lines[i])
@@ -106,7 +111,12 @@ end
 local function handle_time_machine(lines)
     vim.b.time_machine_entries = parse_time_machine(lines)
     vim.b.time_machine_cur_idx = 1
-    git_time_machine_next()
+    if #vim.b.time_machine_entries > 1 then
+        git_time_machine_next()
+    else
+        vim.cmd[[echohl ErrorMsg | echo "No git history for file!" | echohl None]]
+        git_time_machine_quit()
+    end
 end
 
 function setup_timemachine_popup()
@@ -160,11 +170,6 @@ local function git_time_machine()
             end)()
         end
     }:start()
-end
-
-local function git_time_machine_quit()
-    vim.api.nvim_win_close(vim.b.popup_win, true)
-    vim.api.nvim_command('bd')
 end
 
 local function git_time_machine_copy_sha()
