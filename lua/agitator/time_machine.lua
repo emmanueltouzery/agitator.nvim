@@ -44,7 +44,13 @@ local function git_time_machine_display()
     local complete_fname = utils.git_root_folder() .. '/' .. vim.b.time_machine_entries[i].filename
     local relative_fname = complete_fname:gsub(escape_pattern(vim.fn.getcwd()) .. '/', '')
     utils.open_file_branch(commit_sha, relative_fname)
-    vim.fn.setpos('.', save_pos)
+    if vim.b.time_machine_init_line_no ~= nil then
+        -- one-time only: restore the line number from the original buffer
+        vim.cmd(':' .. vim.b.time_machine_init_line_no)
+        vim.b.time_machine_init_line_no = nil
+    else
+        vim.fn.setpos('.', save_pos)
+    end
     local record = vim.b.time_machine_entries[i]
     local entries_count = #vim.b.time_machine_entries
     vim.defer_fn(function() time_machine_statusline(i, entries_count, record) end, 50)
@@ -129,6 +135,7 @@ end
 -- 'git log --no-merges -- afc/pom.xml'
 local function git_time_machine()
     local relative_fname = utils.get_relative_fname()
+    local line_no = vim.fn.line('.')
     vim.api.nvim_command('new')
     vim.api.nvim_command('nnoremap <buffer> <c-p> :lua require"agitator".git_time_machine_previous()<CR>')
     vim.api.nvim_command('nnoremap <buffer> <c-n> :lua require"agitator".git_time_machine_next()<CR>')
@@ -136,6 +143,7 @@ local function git_time_machine()
     vim.api.nvim_command('nnoremap <buffer> q :lua require"agitator".git_time_machine_quit()<CR>')
     setup_timemachine_popup()
     vim.b.time_machine_rel_fname = relative_fname
+    vim.b.time_machine_init_line_no = line_no
     local Job = require'plenary.job'
     local output = {}
     Job:new {
