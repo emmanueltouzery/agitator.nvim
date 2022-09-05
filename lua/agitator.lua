@@ -4,6 +4,7 @@ local time_machine = require('agitator.time_machine')
 
 return {
     open_file_git_branch = open_file_branch.open_file_git_branch,
+    search_git_branch = open_file_branch.search_git_branch,
     git_blame = blame.git_blame,
     git_blame_close = blame.git_blame_close,
     git_blame_toggle = blame.git_blame_toggle,

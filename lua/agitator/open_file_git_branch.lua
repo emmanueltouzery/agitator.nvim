@@ -29,7 +29,37 @@ local function pick_file_from_branch(branch)
     }):find()
 end
 
-local function open_file_git_branch()
+local function search_in_branch(branch)
+    local opts = {}
+    local relative_fname = utils.get_relative_fname()
+    opts.initial_mode = 'insert'
+    opts.default_text = vim.fn.expand('<cword>')
+    pickers.new(opts, {
+        prompt_title = "search expression",
+        finder = finders.new_job(function(prompt) 
+            return {"git", "grep", "-n", prompt, branch, opts}
+        end),
+        sorter = conf.generic_sorter(opts),
+        attach_mappings = function(prompt_bufnr, map)
+            actions.select_default:replace(function()
+                actions.close(prompt_bufnr)
+                local selection = action_state.get_selected_entry()
+                -- it's branch:path:line:string => extract path
+                local path_line_string = selection[1]:gsub("^[^:]+:", "") -- dropped branch
+                local path = path_line_string:gsub(":.*$", "")
+                local line = path_line_string:gsub("^[^:]+:", ""):gsub(":.*$", "")
+                -- open fugitive for that branch and filename
+                -- vim.cmd('Gedit ' .. branch .. ':' .. selection[1])
+                vim.api.nvim_command('enew')
+                utils.open_file_branch(branch, path)
+                vim.cmd(':' .. line)
+            end)
+            return true
+        end,
+    }):find()
+end
+
+local function pick_branch(cb)
     local opts = {}
 
     pickers.new(opts, {
@@ -44,7 +74,7 @@ local function open_file_git_branch()
             -- schedule so this triggers when telescope cleans up
             -- this picker, else telescope behaves a little strangely
             vim.schedule(function()
-                pick_file_from_branch(branch)
+                cb(branch)
             end)
           end)
           return true
@@ -53,5 +83,6 @@ local function open_file_git_branch()
 end
 
 return {
-    open_file_git_branch = open_file_git_branch
+    open_file_git_branch = function() pick_branch(pick_file_from_branch) end,
+    search_git_branch = function() pick_branch(search_in_branch) end,
 }

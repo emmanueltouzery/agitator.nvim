@@ -52,6 +52,14 @@ The selected file from another branch is then displayed in a read-only buffer.
 
 - `open_file_git_branch()`
 
+## search in git branch
+
+search git branch will open two telescope pickers in succession. The first one to
+pick a git branch; the second one to enter text to search for in that branch.
+The selected file from another branch is then displayed in a read-only buffer.
+
+- `search_git_branch()`
+
 ## time machine
 
 ![time machine screenshot](https://raw.githubusercontent.com/wiki/emmanueltouzery/agitator.nvim/time-machine.png)
