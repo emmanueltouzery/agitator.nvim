@@ -16,6 +16,9 @@ local function time_machine_statusline(i, entries_count, record)
         if vim.api.nvim_win_is_valid(vim.b.popup_win) then
             vim.api.nvim_win_close(vim.b.popup_win, true)
         end
+        if vim.api.nvim_buf_is_valid(vim.b.popup_buf) then
+            vim.api.nvim_buf_delete(vim.b.popup_buf, {force=true})
+        end
         setup_timemachine_popup()
     end
 
@@ -71,7 +74,12 @@ local function git_time_machine_previous()
 end
 
 local function git_time_machine_quit()
-    vim.api.nvim_win_close(vim.b.popup_win, true)
+    if vim.api.nvim_win_is_valid(vim.b.popup_win) then
+        vim.api.nvim_win_close(vim.b.popup_win, true)
+    end
+    if vim.api.nvim_buf_is_valid(vim.b.popup_buf) then
+        vim.api.nvim_buf_delete(vim.b.popup_buf, {force=true})
+    end
     vim.api.nvim_command('bd')
 end
 
