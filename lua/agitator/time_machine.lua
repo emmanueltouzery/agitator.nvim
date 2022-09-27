@@ -26,7 +26,7 @@ local function time_machine_statusline(i, entries_count, record)
         force_length(record.author, 53), 
         force_length(record.message, 53), 
         record.date .. " - " .. (entries_count - i + 1) .. "/" .. entries_count,
-        '<c-p> Previous | <c-n> Next | <c-y> Copy SHA | [q]uit'
+        '<c-p> Previous | <c-n> Next | <c-h> Copy SHA | [q]uit'
     }
     vim.api.nvim_buf_set_lines(vim.b.popup_buf, 0, -1, false, lines)
 
@@ -157,7 +157,7 @@ local function git_time_machine()
     vim.api.nvim_command('new')
     vim.api.nvim_command('nnoremap <buffer> <c-p> :lua require"agitator".git_time_machine_previous()<CR>')
     vim.api.nvim_command('nnoremap <buffer> <c-n> :lua require"agitator".git_time_machine_next()<CR>')
-    vim.api.nvim_command('nnoremap <buffer> <c-y> :lua require"agitator".git_time_machine_copy_sha()<CR>')
+    vim.api.nvim_command('nnoremap <buffer> <c-h> :lua require"agitator".git_time_machine_copy_sha()<CR>')
     vim.api.nvim_command('nnoremap <buffer> q :lua require"agitator".git_time_machine_quit()<CR>')
     setup_timemachine_popup()
     vim.b.time_machine_rel_fname = relative_fname
