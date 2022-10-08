@@ -183,7 +183,7 @@ end
 local function git_time_machine_copy_sha()
     local i = vim.b.time_machine_cur_idx
     local commit_sha = vim.b.time_machine_entries[i].sha
-    vim.api.nvim_command("let @+ = '" .. commit_sha .. "'")
+    vim.fn.setreg('+', commit_sha)
 end
 
 return {
