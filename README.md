@@ -69,7 +69,9 @@ It opens a new read-only window, where you can navigate through
 past versions of the file and view their contents.
 Details about the currently displayed version appear in a popup window at the bottom-right.
 
-- `git_time_machine()`
+- `git_time_machine({use_current_win?})`
+
+You can pass in `{use_current_win: true}` to reuse the current window instead of creating a new one.
 
 ## General
 

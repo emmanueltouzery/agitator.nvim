@@ -151,10 +151,14 @@ function setup_timemachine_popup()
 end
 
 -- 'git log --no-merges -- afc/pom.xml'
-local function git_time_machine()
+local function git_time_machine(opts)
     local relative_fname = utils.get_relative_fname()
     local line_no = vim.fn.line('.')
-    vim.api.nvim_command('new')
+    if opts ~= nil and opts.use_current_win then
+        vim.api.nvim_command('enew')
+    else
+        vim.api.nvim_command('new')
+    end
     vim.api.nvim_command('nnoremap <buffer> <c-p> :lua require"agitator".git_time_machine_previous()<CR>')
     vim.api.nvim_command('nnoremap <buffer> <c-n> :lua require"agitator".git_time_machine_next()<CR>')
     vim.api.nvim_command('nnoremap <buffer> <c-h> :lua require"agitator".git_time_machine_copy_sha()<CR>')
