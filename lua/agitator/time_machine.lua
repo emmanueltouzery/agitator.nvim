@@ -119,7 +119,7 @@ end
 local function handle_time_machine(lines)
     vim.b.time_machine_entries = parse_time_machine(lines)
     vim.b.time_machine_cur_idx = 1
-    if #vim.b.time_machine_entries > 1 then
+    if #vim.b.time_machine_entries >= 1 then
         git_time_machine_next()
     else
         vim.cmd[[echohl ErrorMsg | echo "No git history for file!" | echohl None]]
