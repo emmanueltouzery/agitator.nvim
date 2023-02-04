@@ -86,6 +86,14 @@ local function render_blame_sidebar(results, opts)
     return save_pos
 end
 
+local function git_blame_close()
+    vim.api.nvim_command('set noscrollbind')
+    vim.api.nvim_command('set nocursorbind')
+    local fname = vim.fn.expand('%:p')
+    vim.api.nvim_command("bd " .. vim.b.blame_buf_id)
+    vim.b.blame_buf_id = nil
+end
+
 -- https://www.reddit.com/r/vim/comments/9ydreq/vanilla_solutions_to_git_blame/ea1sgej/
 local function position_blame_sidebar(save_pos)
     local blame_buf_id = vim.fn.bufnr('%')
@@ -93,6 +101,23 @@ local function position_blame_sidebar(save_pos)
     vim.api.nvim_command('setlocal scrollbind')
     vim.api.nvim_command('setlocal cursorbind nowrap')
     vim.api.nvim_command('wincmd p') -- return to the original window
+
+    -- if to avoid adding tons of autocmds if the user toggles
+    -- blame multiple times on a single buffer
+    if vim.b.blame_buf_id == nil then
+        vim.api.nvim_create_autocmd(
+        { "BufHidden", "BufUnload" },
+        {
+            callback = function()
+                if vim.b.blame_buf_id ~= nil then
+                    git_blame_close()
+                end
+            end,
+            buffer = vim.fn.bufnr('%'),
+            desc = "Turn off relative line numbering when the buffer is exited.",
+        })
+    end
+
     vim.b.blame_buf_id = blame_buf_id
     vim.api.nvim_command('setlocal scrollbind')
     vim.api.nvim_command('setlocal cursorbind')
@@ -149,14 +174,6 @@ local function git_blame(opts)
         job_params.cwd = utils.git_root_folder()
     end
     Job:new(job_params):start()
-end
-
-local function git_blame_close()
-    vim.api.nvim_command('set noscrollbind')
-    vim.api.nvim_command('set nocursorbind')
-    local fname = vim.fn.expand('%:p')
-    vim.api.nvim_command("bd " .. vim.b.blame_buf_id)
-    vim.b.blame_buf_id = nil
 end
 
 local function git_blame_toggle(opts)
