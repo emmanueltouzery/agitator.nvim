@@ -80,7 +80,13 @@ local function git_time_machine_quit()
     if vim.api.nvim_buf_is_valid(vim.b.popup_buf) then
         vim.api.nvim_buf_delete(vim.b.popup_buf, {force=true})
     end
-    vim.api.nvim_command('bd')
+    -- need the schedule_wrap and pcall in case this is
+    -- called from an autocmd, in which case the buffer is "busy"
+    -- since an autocmd is running on it
+    local bufnr = vim.fn.bufnr('%')
+    vim.schedule_wrap(function()
+        pcall(vim.api.nvim_buf_delete, bufnr, {force=true})
+    end)()
 end
 
 local function parse_time_machine_record(lines, i)
@@ -150,7 +156,6 @@ function setup_timemachine_popup()
     vim.b.popup_win = vim.api.nvim_open_win(vim.b.popup_buf, false, opts)
 end
 
--- 'git log --no-merges -- afc/pom.xml'
 local function git_time_machine(opts)
     local relative_fname = utils.get_relative_fname()
     local line_no = vim.fn.line('.')
@@ -163,6 +168,15 @@ local function git_time_machine(opts)
     vim.api.nvim_command('nnoremap <buffer> <c-n> :lua require"agitator".git_time_machine_next()<CR>')
     vim.api.nvim_command('nnoremap <buffer> <c-h> :lua require"agitator".git_time_machine_copy_sha()<CR>')
     vim.api.nvim_command('nnoremap <buffer> q :lua require"agitator".git_time_machine_quit()<CR>')
+    local bufnr = vim.fn.bufnr('%')
+    vim.api.nvim_create_autocmd({"BufUnload", "BufHidden"}, {
+        buffer = bufnr,
+        callback = function(ev)
+            vim.api.nvim_buf_call(bufnr, function()
+                git_time_machine_quit()
+            end)
+        end
+    })
     setup_timemachine_popup()
     vim.b.time_machine_rel_fname = relative_fname
     vim.b.time_machine_init_line_no = line_no
