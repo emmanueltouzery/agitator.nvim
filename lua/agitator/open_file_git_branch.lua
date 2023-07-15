@@ -6,6 +6,14 @@ local conf = require("telescope.config").values
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 
+local function open_branch_action(branch, prompt_bufnr, action)
+    actions.close(prompt_bufnr)
+    local selection = action_state.get_selected_entry()
+    -- open fugitive for that branch and filename
+    vim.api.nvim_command(action)
+    utils.open_file_branch(branch, selection[1])
+end
+
 local function pick_file_from_branch(branch)
     local opts = {}
     local relative_fname = utils.get_relative_fname()
@@ -17,12 +25,10 @@ local function pick_file_from_branch(branch)
         sorter = conf.generic_sorter(opts),
         attach_mappings = function(prompt_bufnr, map)
             actions.select_default:replace(function()
-                actions.close(prompt_bufnr)
-                local selection = action_state.get_selected_entry()
-                -- open fugitive for that branch and filename
-                -- vim.cmd('Gedit ' .. branch .. ':' .. selection[1])
-                vim.api.nvim_command('enew')
-                utils.open_file_branch(branch, selection[1])
+                open_branch_action(branch, prompt_bufnr, 'enew')
+            end)
+            actions.select_vertical:replace(function()
+                open_branch_action(branch, prompt_bufnr, 'vnew')
             end)
             return true
         end,
