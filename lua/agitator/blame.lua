@@ -141,6 +141,9 @@ local function handle_blame(lines, opts)
 end
 
 local function git_blame(opts)
+    -- disable word-wrapping so that the rows will match. see #9
+    vim.cmd[[echohl WarningMsg | echo "Disabling word-wrapping to display blame" | echohl None]]
+    vim.cmd'set nowrap'
     local Job = require'plenary.job'
     local output = {}
     local relative_fname
