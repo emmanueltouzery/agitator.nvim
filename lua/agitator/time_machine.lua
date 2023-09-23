@@ -140,6 +140,7 @@ function setup_timemachine_popup()
     vim.b.popup_buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_option(vim.b.popup_buf, 'buftype', 'nofile')
     vim.api.nvim_buf_set_option(vim.b.popup_buf, 'modifiable', true)
+    vim.api.nvim_buf_set_option(vim.b.popup_buf, 'filetype', 'AgitatorTimeMachine')
 
     local opts = {
         focusable = false,
