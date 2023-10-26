@@ -187,7 +187,8 @@ local function git_time_machine(opts)
         command = 'git',
         -- i'd really want a plumbing command here, but i think there isn't one
         -- https://stackoverflow.com/a/29239964/516188
-        args = {'log', '--name-only', '--no-merges', '--follow', '--date=iso', '--', relative_fname}, 
+        -- enforce the pretty configuration in case the user customizes it: https://github.com/emmanueltouzery/agitator.nvim/issues/13
+        args = {'log', '--name-only', '--no-merges', '--follow', '--date=iso', '--pretty=medium', '--', relative_fname}, 
         on_stdout = function(error, data, self)
             table.insert(output, data)
         end,
