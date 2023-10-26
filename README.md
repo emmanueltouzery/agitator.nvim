@@ -69,9 +69,42 @@ It opens a new read-only window, where you can navigate through
 past versions of the file and view their contents.
 Details about the currently displayed version appear in a popup window at the bottom-right.
 
-- `git_time_machine({use_current_win?})`
+- `git_time_machine({use_current_win?, set_custom_shortcuts?, popup_last_line?, popup_width?})`
 
 You can pass in `{use_current_win: true}` to reuse the current window instead of creating a new one.
+
+`set_custom_shortcuts` allows to customize the shortcuts for the time machine.
+It should be a function, that'll receive the buffer number of the time machine.
+You should set up the autocommands you want; you can reproduce the default behavior with this implementation:
+
+```lua
+{
+  set_custom_shortcuts = function(code_bufnr)
+    vim.keymap.set('n', '<c-p>', function()
+      require"agitator".git_time_machine_previous()
+    end, {buffer = code_bufnr})
+    vim.keymap.set('n', '<c-n>', function()
+      require"agitator".git_time_machine_next()
+    end, {buffer = code_bufnr})
+    vim.keymap.set('n', '<c-h>', function()
+      require"agitator".git_time_machine_copy_sha()
+    end, {buffer = code_bufnr})
+    vim.keymap.set('n', 'q', function()
+      require"agitator".git_time_machine_quit()
+    end, {buffer = code_bufnr})
+  end
+}
+```
+
+If you change the shortcuts for instance, you'd probably want to change the shortcut hints at the bottom
+of the popup window. You can do that with the `popup_last_line` option. You can reproduce the default
+behavior with this implementation:
+
+```lua
+{ popup_last_line: '<c-p> Previous | <c-n> Next | <c-h> Copy SHA | [q]uit' }
+```
+
+You can also change the popup width with `popup_width`. The default value is currently 53.
 
 ## General
 

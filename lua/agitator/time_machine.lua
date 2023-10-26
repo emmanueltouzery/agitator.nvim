@@ -23,10 +23,10 @@ local function time_machine_statusline(i, entries_count, record)
     end
 
     local lines = {
-        force_length(record.author, 53), 
-        force_length(record.message, 53), 
+        force_length(record.author, vim.b.popup_width),
+        force_length(record.message, vim.b.popup_width),
         record.date .. " - " .. (entries_count - i + 1) .. "/" .. entries_count,
-        '<c-p> Previous | <c-n> Next | <c-h> Copy SHA | [q]uit'
+        vim.b.popup_last_line
     }
     vim.api.nvim_buf_set_lines(vim.b.popup_buf, 0, -1, false, lines)
 
@@ -133,11 +133,13 @@ local function handle_time_machine(lines)
     end
 end
 
-function setup_timemachine_popup()
+function setup_timemachine_popup(opts)
     vim.b.width = vim.fn.winwidth(0)
     vim.b.height = vim.fn.winheight(0)
 
     vim.b.popup_buf = vim.api.nvim_create_buf(false, true)
+    vim.b.popup_last_line = (opts and opts.popup_last_line) or '<c-p> Previous | <c-n> Next | <c-h> Copy SHA | [q]uit'
+    vim.b.popup_width = (opts and opts.popup_width) or 53
     vim.api.nvim_buf_set_option(vim.b.popup_buf, 'buftype', 'nofile')
     vim.api.nvim_buf_set_option(vim.b.popup_buf, 'modifiable', true)
     vim.api.nvim_buf_set_option(vim.b.popup_buf, 'filetype', 'AgitatorTimeMachine')
@@ -147,7 +149,7 @@ function setup_timemachine_popup()
         style = "minimal",
         border = "rounded",
         relative = "win",
-        width = 53,
+        width = vim.b.popup_width,
         height = 4,
         anchor = "SE",
         row = vim.b.height,
@@ -165,10 +167,6 @@ local function git_time_machine(opts)
     else
         vim.api.nvim_command('new')
     end
-    vim.api.nvim_command('nnoremap <buffer> <c-p> :lua require"agitator".git_time_machine_previous()<CR>')
-    vim.api.nvim_command('nnoremap <buffer> <c-n> :lua require"agitator".git_time_machine_next()<CR>')
-    vim.api.nvim_command('nnoremap <buffer> <c-h> :lua require"agitator".git_time_machine_copy_sha()<CR>')
-    vim.api.nvim_command('nnoremap <buffer> q :lua require"agitator".git_time_machine_quit()<CR>')
     local bufnr = vim.fn.bufnr('%')
     vim.api.nvim_create_autocmd({"BufUnload", "BufHidden"}, {
         buffer = bufnr,
@@ -178,7 +176,23 @@ local function git_time_machine(opts)
             end)
         end
     })
-    setup_timemachine_popup()
+    setup_timemachine_popup(opts)
+    if opts ~= nil and opts.set_custom_shortcuts ~= nil then
+        opts.set_custom_shortcuts(bufnr)
+    else
+        vim.keymap.set('n', '<c-p>', function()
+            require"agitator".git_time_machine_previous()
+        end, {buffer = 0})
+        vim.keymap.set('n', '<c-n>', function()
+            require"agitator".git_time_machine_next()
+        end, {buffer = 0})
+        vim.keymap.set('n', '<c-h>', function()
+            require"agitator".git_time_machine_copy_sha()
+        end, {buffer = 0})
+        vim.keymap.set('n', 'q', function()
+            require"agitator".git_time_machine_quit()
+        end, {buffer = 0})
+    end
     vim.b.time_machine_rel_fname = relative_fname
     vim.b.time_machine_init_line_no = line_no
     local Job = require'plenary.job'
