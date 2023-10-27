@@ -101,7 +101,7 @@ of the popup window. You can do that with the `popup_last_line` option. You can 
 behavior with this implementation:
 
 ```lua
-{ popup_last_line: '<c-p> Previous | <c-n> Next | <c-h> Copy SHA | [q]uit' }
+{ popup_last_line = '<c-p> Previous | <c-n> Next | <c-h> Copy SHA | [q]uit' }
 ```
 
 You can also change the popup width with `popup_width`. The default value is currently 53.
