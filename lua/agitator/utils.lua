@@ -32,27 +32,28 @@ end
 local function parse_fugitive_uri(name)
    local _, _, root_path, sub_module_path, commit, real_path = name:find([[^fugitive://(.*)/%.git(.*/)/(%x-)/(.*)]])
    if commit == '0' then
-
-      commit = nil
+       commit = nil
    end
    if root_path then
-      sub_module_path = sub_module_path:gsub("^/modules", "")
-      name = root_path .. sub_module_path .. real_path
+       sub_module_path = sub_module_path:gsub("^/modules", "")
+       name = root_path .. sub_module_path .. real_path
+       return name, commit
    end
-   return name, commit
+   return nil, nil
 end
 
 -- function taken from gitsigns
 local function parse_gitsigns_uri(name)
-   local _, _, root_path, commit, rel_path = 
-   name:find([[^gitsigns://(.*)/%.git/(.*):(.*)]])
+   local _, _, root_path, commit, rel_path =
+      name:find([[^gitsigns://(.*)/%.git/(.*):(.*)]])
    if commit == ':0' then
-      commit = nil
+       commit = nil
    end
    if root_path then
-      name = root_path .. '/' .. rel_path
+       name = root_path .. '/' .. rel_path
+       return name, commit
    end
-   return name, commit
+   return nil, nil
 end
 
 local function fname_commit_associated_with_buffer()
@@ -105,7 +106,11 @@ function escape_pattern(text)
 end
 
 local function get_relative_fname()
-    local fname = vim.fn.expand('%:p')
+    -- need fs_realpath to resolve symbolic links for instance
+    local fname = vim.loop.fs_realpath(vim.api.nvim_buf_get_name(0))
+      or vim.api.nvim_buf_call(0, function()
+        return vim.fn.expand('%:p')
+    end)
     return fname:gsub(escape_pattern(vim.fn.getcwd()) .. '/', '')
 end
 

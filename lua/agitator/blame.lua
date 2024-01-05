@@ -152,7 +152,7 @@ local function git_blame(opts)
     local buf_fname, buf_commit = utils.fname_commit_associated_with_buffer()
     if buf_fname ~= nil then
         relative_fname = buf_fname
-    else 
+    else
         relative_fname = utils.get_relative_fname()
     end
     -- i think -p only would be maybe faster, git's output differs with
