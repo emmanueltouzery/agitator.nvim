@@ -1,6 +1,7 @@
 local open_file_branch = require('agitator.open_file_git_branch')
 local blame = require('agitator.blame')
 local time_machine = require('agitator.time_machine')
+local search_in_added = require('agitator.search_in_added')
 
 return {
     open_file_git_branch = open_file_branch.open_file_git_branch,
@@ -13,5 +14,6 @@ return {
     git_time_machine_next = time_machine.git_time_machine_next,
     git_time_machine_previous = time_machine.git_time_machine_previous,
     git_time_machine_copy_sha = time_machine.git_time_machine_copy_sha,
-    git_time_machine_quit = time_machine.git_time_machine_quit
+    git_time_machine_quit = time_machine.git_time_machine_quit,
+    search_in_added = search_in_added.search_in_added,
 }
