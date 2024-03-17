@@ -60,6 +60,13 @@ The selected file from another branch is then displayed in a read-only buffer.
 
 - `search_git_branch()`
 
+## search in added lines
+
+search in added will open a telescope picker to search in lines that you've
+added compared to your git checkout: basically you search in the git diff.
+
+- `search_in_added()`
+
 ## time machine
 
 ![time machine screenshot](https://raw.githubusercontent.com/wiki/emmanueltouzery/agitator.nvim/time-machine.png)
