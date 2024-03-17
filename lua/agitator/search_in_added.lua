@@ -25,7 +25,7 @@ local function search_in_added_add_untracked(lines_with_numbers, opts)
         on_exit = vim.schedule_wrap(function(j, output)
             pickers
             .new(opts, {
-                prompt_title = "Search in git added files",
+                prompt_title = "Search in git added",
                 finder = finders.new_table {
                     results = lines_with_numbers,
                     entry_maker = make_entry.gen_from_vimgrep(opts),
