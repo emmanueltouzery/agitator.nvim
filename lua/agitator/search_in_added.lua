@@ -12,11 +12,11 @@ local function search_in_added_add_untracked(lines_with_numbers, opts)
         on_stdout = vim.schedule_wrap(function(j, output)
             for _, untracked_fname in ipairs(output) do
                 if untracked_fname ~= "" then
-                    local path = Path.new(vim.fn.getcwd() .. "/" .. untracked_fname)
+                    local path = Path.new(vim.fs.root(0, ".git") .. "/" .. untracked_fname)
                     local contents = path:read()
                     local cur_line = 1
                     for line in contents:gmatch("([^\n]*)\n?") do
-                        table.insert(lines_with_numbers, vim.fn.getcwd() .. "/" .. untracked_fname .. ":" .. cur_line .. ":" .. 1 .. ":" .. line)
+                        table.insert(lines_with_numbers, vim.fs.root(0, ".git") .. "/" .. untracked_fname .. ":" .. cur_line .. ":" .. 1 .. ":" .. line)
                         cur_line = cur_line + 1
                     end
                 end
@@ -54,7 +54,7 @@ local function search_in_added(opts)
                     cur_line = tonumber(string.gmatch(line, "%+(%d+)")())
                 elseif string.match(line, "^%+") then
                     -- added line
-                    table.insert(lines_with_numbers, vim.fn.getcwd() .. "/" .. cur_file .. ":" .. cur_line .. ":" .. 1 .. ":" .. string.sub(line, 2, -1))
+                    table.insert(lines_with_numbers, vim.fs.root(0, ".git") .. "/" .. cur_file .. ":" .. cur_line .. ":" .. 1 .. ":" .. string.sub(line, 2, -1))
                     cur_line = cur_line + 1
                 end
             end
