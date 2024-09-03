@@ -73,20 +73,33 @@ local function git_time_machine_previous()
     git_time_machine_display()
 end
 
-local function git_time_machine_quit()
+local function git_time_machine_quit(opts)
     if vim.api.nvim_win_is_valid(vim.b.popup_win) then
         vim.api.nvim_win_close(vim.b.popup_win, true)
     end
     if vim.api.nvim_buf_is_valid(vim.b.popup_buf) then
         vim.api.nvim_buf_delete(vim.b.popup_buf, {force=true})
     end
+    local bufnr = vim.fn.bufnr('%')
+    local orig_bufnr = vim.b.orig_bufnr
+    local use_current_win = false
+    if opts and opts.use_current_win then
+        use_current_win = opts.use_current_win
+    end
+    vim.b.buf__closing = true
     -- need the schedule_wrap and pcall in case this is
     -- called from an autocmd, in which case the buffer is "busy"
     -- since an autocmd is running on it
-    local bufnr = vim.fn.bufnr('%')
-    vim.schedule_wrap(function()
-        pcall(vim.api.nvim_buf_delete, bufnr, {force=true})
-    end)()
+    vim.defer_fn(function()
+        if use_current_win then
+            if vim.api.nvim_buf_is_valid(orig_bufnr) then
+                vim.api.nvim_win_set_buf(0, orig_bufnr)
+            end
+        end
+        vim.defer_fn(function()
+            pcall(vim.api.nvim_buf_delete, bufnr, {force=true})
+        end, 50)
+    end, 50)
 end
 
 local function parse_time_machine_record(lines, i)
@@ -122,14 +135,14 @@ local function parse_time_machine(lines)
     return results
 end
 
-local function handle_time_machine(lines)
+local function handle_time_machine(lines, opts)
     vim.b.time_machine_entries = parse_time_machine(lines)
     vim.b.time_machine_cur_idx = 1
     if #vim.b.time_machine_entries >= 1 then
         git_time_machine_next()
     else
         vim.cmd[[echohl ErrorMsg | echo "No git history for file!" | echohl None]]
-        git_time_machine_quit()
+        git_time_machine_quit(opts)
     end
 end
 
@@ -163,7 +176,9 @@ local function git_time_machine(opts)
     local relative_fname = utils.get_relative_fname()
     local line_no = vim.fn.line('.')
     if opts ~= nil and opts.use_current_win then
+        local cur_buf = vim.api.nvim_win_get_buf(0)
         vim.api.nvim_command('enew')
+        vim.b.orig_bufnr = cur_buf
     else
         vim.api.nvim_command('new')
     end
@@ -172,7 +187,9 @@ local function git_time_machine(opts)
         buffer = bufnr,
         callback = function(ev)
             vim.api.nvim_buf_call(bufnr, function()
-                git_time_machine_quit()
+                if not vim.b.buf__closing then
+                    git_time_machine_quit(opts)
+                end
             end)
         end
     })
@@ -190,7 +207,7 @@ local function git_time_machine(opts)
             require"agitator".git_time_machine_copy_sha()
         end, {buffer = 0})
         vim.keymap.set('n', 'q', function()
-            require"agitator".git_time_machine_quit()
+            require"agitator".git_time_machine_quit(opts)
         end, {buffer = 0})
     end
     vim.b.time_machine_rel_fname = relative_fname
@@ -208,7 +225,7 @@ local function git_time_machine(opts)
         end,
         on_exit = function(self, code, signal)
             vim.schedule_wrap(function()
-                handle_time_machine(output)
+                handle_time_machine(output, opts)
             end)()
         end
     }:start()
