@@ -45,7 +45,7 @@ local function git_time_machine_display()
     vim.bo.modifiable = true
     vim.api.nvim_command('%delete')
     local complete_fname = utils.git_root_folder() .. '/' .. vim.b.time_machine_entries[i].filename
-    local relative_fname = complete_fname:gsub(escape_pattern(vim.fn.getcwd()) .. '/', '')
+    local relative_fname = complete_fname:gsub(utils.escape_pattern(utils.get_cwd()) .. '/', '')
     utils.open_file_branch(commit_sha, relative_fname)
     if vim.b.time_machine_init_line_no ~= nil then
         -- one-time only: restore the line number from the original buffer

@@ -1,3 +1,11 @@
+local function get_cwd()
+    local cwd = vim.fn.getcwd()
+    if vim.fn.has("win32") then
+        return cwd:gsub("\\", "/")
+    else
+        return cwd
+    end
+end
 -- https://vi.stackexchange.com/a/3749/38754
 local function open_file_branch(branch, fname)
     vim.api.nvim_exec('silent r! git show ' .. branch .. ':./' .. fname, false)
@@ -6,7 +14,7 @@ local function open_file_branch(branch, fname)
     local base_bufcmd = 'silent file [' .. branch .. '] ' .. fname_without_path
     local git_root_folder = git_root_folder()
     local commit = commit_head_of_branch(branch)
-    local path_in_git_prj = (vim.fn.getcwd() .. '/' .. fname):gsub(escape_pattern(git_root_folder) .. '/', '')
+    local path_in_git_prj = (get_cwd() .. '/' .. fname):gsub(escape_pattern(git_root_folder) .. '/', '')
     vim.b.agitator_commit = commit
     vim.b.agitator_path_in_git_prj = path_in_git_prj
     -- if we try to open twice the same file from the same branch, we get
@@ -111,7 +119,7 @@ local function get_relative_fname()
       or vim.api.nvim_buf_call(0, function()
         return vim.fn.expand('%:p')
     end)
-    return fname:gsub(escape_pattern(vim.fn.getcwd()) .. '/', '')
+    return fname:gsub(escape_pattern(get_cwd()) .. '/', '')
 end
 
 return {
@@ -120,4 +128,5 @@ return {
     escape_pattern = escape_pattern,
     git_root_folder = git_root_folder,
     fname_commit_associated_with_buffer = fname_commit_associated_with_buffer,
+    get_cwd = get_cwd,
 }
