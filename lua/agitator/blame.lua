@@ -189,13 +189,17 @@ local function git_blame_toggle(opts)
     end
 end
 
-local function git_blame_commit_for_line()
+local function git_blame_commit_for_line(_opts)
+    local opts = _opts or {}
     local relative_fname, commit = utils.fname_commit_associated_with_buffer()
     if relative_fname == nil then
         relative_fname = utils.get_relative_fname()
     end
     local output
-    local git_args = {'blame', '-L' .. vim.fn.line('.') .. ',' .. vim.fn.line('.'), relative_fname}
+    local git_args = {'blame', '-L' .. vim.fn.line('.') .. ',' .. vim.fn.line('.'), opts.fname or relative_fname}
+    if opts.as_of_commit ~= nil then
+        git_args = {'blame', '-L' .. vim.fn.line('.') .. ',' .. vim.fn.line('.'), opts.as_of_commit, '--', opts.fname or relative_fname}
+    end
     local job_params = {
         command = 'git',
         args = git_args,
