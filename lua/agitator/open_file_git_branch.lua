@@ -70,7 +70,7 @@ local function pick_branch(cb)
 
     pickers.new(opts, {
         prompt_title = "branch",
-        finder = finders.new_oneshot_job { "git", "branch", "-a" },
+        finder = finders.new_oneshot_job { "git", "branch", "--sort=-committerdate", "-a" },
         sorter = conf.generic_sorter(opts),
         attach_mappings = function(prompt_bufnr, map)
           actions.select_default:replace(function()
