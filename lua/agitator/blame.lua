@@ -207,7 +207,7 @@ local function git_blame_commit_for_line(_opts)
             output = data:gsub("%s.*$", "")
         end,
     }
-    if commit ~= nil then
+    if commit ~= nil or opts.as_of_commit ~= nil then
         table.insert(git_args, commit)
         job_params.cwd = utils.git_root_folder()
     end
