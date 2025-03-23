@@ -9,15 +9,19 @@ local entry_display = require "telescope.pickers.entry_display"
 local function search_in_added_add_untracked(lines_with_numbers, opts)
     local Path = require("plenary.path")
     vim.fn.jobstart("git ls-files . --exclude-standard --others", {
+        stdout_buffered = true,
         on_stdout = vim.schedule_wrap(function(j, output)
             for _, untracked_fname in ipairs(output) do
                 if untracked_fname ~= "" then
                     local path = Path.new(vim.fs.root(0, ".git") .. "/" .. untracked_fname)
-                    local contents = path:read()
-                    local cur_line = 1
-                    for line in contents:gmatch("([^\n]*)\n?") do
-                        table.insert(lines_with_numbers, vim.fs.root(0, ".git") .. "/" .. untracked_fname .. ":" .. cur_line .. ":" .. 1 .. ":" .. line)
-                        cur_line = cur_line + 1
+                    local stat = vim.uv.fs_lstat(path.filename)
+                    if stat ~= nil and stat.type ~= "link" then
+                        local contents = path:read()
+                        local cur_line = 1
+                        for line in contents:gmatch("([^\n]*)\n?") do
+                            table.insert(lines_with_numbers, vim.fs.root(0, ".git") .. "/" .. untracked_fname .. ":" .. cur_line .. ":" .. 1 .. ":" .. line)
+                            cur_line = cur_line + 1
+                        end
                     end
                 end
             end
