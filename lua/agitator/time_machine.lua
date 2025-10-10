@@ -68,7 +68,8 @@ end
 
 local function git_time_machine_focus(sha)
     for index, entry in ipairs(vim.b.time_machine_entries) do
-        if string.sub(entry.sha, 1, string.len(sha)) == sha then
+        -- The param sha could be a short sha, so check against the start of the time machine full sha
+        if string.sub(entry.sha, 1, #sha) == sha then
             vim.b.time_machine_cur_idx = index
             git_time_machine_display()
             return true
@@ -151,6 +152,7 @@ local function handle_time_machine(lines, opts)
     vim.b.time_machine_entries = parse_time_machine(lines)
     vim.b.time_machine_cur_idx = 1
     if #vim.b.time_machine_entries >= 1 then
+        -- Focus the given commit sha if possible
         if opts ~= nil and opts.commit_sha then
             if git_time_machine_focus(opts.commit_sha) then
                 return
