@@ -76,9 +76,12 @@ It opens a new read-only window, where you can navigate through
 past versions of the file and view their contents.
 Details about the currently displayed version appear in a popup window at the bottom-right.
 
-- `git_time_machine({use_current_win?, set_custom_shortcuts?, popup_last_line?, popup_width?})`
+- `git_time_machine({use_current_win?, commit_sha?, set_custom_shortcuts?, popup_last_line?, popup_width?})`
 
 You can pass in `{use_current_win: true}` to reuse the current window instead of creating a new one.
+
+You can also pass in `{commit_sha: "your-sha"}` to open the time machine focused on a specific commit.
+The sha can be a full or short sha (without the `#` prefix).
 
 `set_custom_shortcuts` allows to customize the shortcuts for the time machine.
 It should be a function, that'll receive the buffer number of the time machine.
