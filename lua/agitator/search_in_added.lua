@@ -46,7 +46,7 @@ local function search_in_added(opts)
     local lines_with_numbers = {}
     local cur_file = nil
     local cur_line = nil
-    vim.fn.jobstart("git diff-index -U0 " .. (opts.git_rev or "HEAD"), {
+    vim.fn.jobstart("git diff -U0 " .. (opts.git_rev or "HEAD"), {
         on_stdout = vim.schedule_wrap(function(j, output)
             for _, line in ipairs(output) do
                 if string.match(line, "^%+%+%+") then
